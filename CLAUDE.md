@@ -7,7 +7,7 @@ Web-based 2x2 experimental platform for studying the Gambler's Fallacy in invest
 ## Architecture
 
 - **Backend**: Python 3.11+ / FastAPI / SQLAlchemy async — in `backend/`
-- **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS + Recharts — in `frontend/`
+- **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS + Recharts — in `frontend/` — "Academic Ink" design system
 - **Database**: SQLite (local dev, `backend/exp_platform.db`) or PostgreSQL (production via Docker)
 - **Deployment**: Docker Compose with Nginx reverse proxy
 
@@ -62,9 +62,22 @@ frontend/src/
 └── utils/           # Formatters, label maps
 ```
 
+## Design System: "Academic Ink"
+
+Inspired by academic journals, financial terminals, and Chinese calligraphy.
+
+- **Colors**: Deep ink tones (`ink-900` to `ink-50`) as primary palette, warm amber (`amber-500`/`amber-600`) for accents/CTAs, `paper` (#fefdfb) for card backgrounds
+- **Fonts**: `font-serif` → Noto Serif SC (display headings), `font-sans` → IBM Plex Sans (body/UI), `font-mono` → IBM Plex Mono (numbers/data)
+- **Trading colors**: Chinese convention — red (`text-up`) for gains, green (`text-down`) for losses
+- **Components**: `.card` (paper bg + hairline border), `.btn-primary` (amber), `.btn-secondary` (outlined), `.animate-fade-up` entrance animation
+- **Pattern**: Subtle paper-texture background via CSS radial-gradient noise
+- **CSS variables**: Defined in `src/index.css` (e.g., `--ink-900`, `--amber-500`, `--paper`)
+- **Tailwind tokens**: Extended in `tailwind.config.js` — `colors.ink.*`, `colors.paper`, `colors.amber.*`, `colors.up`, `colors.down`
+
 ## Coding Conventions
 
 - **Backend**: Python type hints, async/await for all DB operations, Pydantic v2 schemas
+- **Backend queries**: Always use `.order_by(...).limit(1)` when querying trading sessions to prevent `MultipleResultsFound` errors from duplicate sessions
 - **Frontend**: TypeScript strict mode, functional components with hooks, Tailwind utility classes
 - **Language**: UI text is in Chinese (zh-CN). Code comments/docs in English.
 - **IDs**: Stored as UUID strings (String(36)) for SQLite compatibility. No `uuid.UUID()` casts in queries — compare directly as strings.
@@ -107,6 +120,10 @@ frontend/src/
 - `backend/app/api/trading.py` — Core trading loop (period progression, settlement)
 - `frontend/src/pages/participant/TradingPage.tsx` — Trading simulation UI
 - `frontend/src/components/trading/GuidancePopup.tsx` — Phase 2 probability prediction modal
+
+## Known Issues (Resolved)
+
+- **Duplicate trading sessions**: React dev mode double-fires `useEffect`, which could call `POST /trading/start` twice and create duplicate active sessions. Fixed by querying with `status == "active"` + `.limit(1)` in `start_trading`, and `.order_by(created_at.desc()).limit(1)` in all session lookups (`trading.py`, `analysis.py`).
 
 ## Remaining Work
 

@@ -14,7 +14,7 @@ This platform is a web-based research tool for studying and debiasing investor b
 | Frontend | React 18 + TypeScript + Vite |
 | Database | PostgreSQL 15+ (production) / SQLite (local dev) |
 | ORM | SQLAlchemy async + Alembic |
-| Styling | Tailwind CSS |
+| Styling | Tailwind CSS ("Academic Ink" design system) |
 | Charts | Recharts |
 | Deployment | Docker Compose (Nginx + FastAPI + PostgreSQL) |
 
@@ -221,7 +221,7 @@ Four investor profiles based on cognitive × behavioral:
 
 ## Implementation Status
 
-### Completed (Phases 1-4)
+### Completed (Phases 1-5)
 - [x] FastAPI backend with all models, schemas, routes, and services
 - [x] React + Vite + TypeScript + Tailwind frontend
 - [x] Docker Compose + Nginx configuration
@@ -239,8 +239,10 @@ Four investor profiles based on cognitive × behavioral:
 - [x] Event logging system
 - [x] SQLite compatibility for local development
 - [x] Seed script with demo data
+- [x] **"Academic Ink" frontend redesign** (20 files) — ink/amber palette, Noto Serif SC + IBM Plex Sans fonts, paper-texture backgrounds, fade-up animations, card-based layout, Chinese market color convention (red=up, green=down)
+- [x] **Duplicate trading session bugfix** — `.limit(1)` guards on all session queries in `trading.py` and `analysis.py` to prevent `MultipleResultsFound` from React dev-mode double effects
 
-### Remaining (Phases 5-7)
+### Remaining (Phases 6-7)
 - [ ] Multi-stock mode (6 stocks with sparklines, market overview)
 - [ ] Multi-stock trading engine (6 independent positions)
 - [ ] Quantity input dialog for multi-stock mode
