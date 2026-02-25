@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink-900: #0f172a;
+  --ink-800: #1e293b;
+  --ink-700: #334155;
+  --ink-400: #94a3b8;
+  --ink-200: #e2e8f0;
+  --ink-100: #f1f5f9;
+  --ink-50:  #f8fafc;
+  --paper:   #fefdfb;
+  --amber-500: #f59e0b;
+  --amber-600: #d97706;
+  --amber-100: #fef3c7;
+  --up:      #dc2626;
+  --down:    #16a34a;
+}
+
+@layer base {
+  html {
+    @apply text-ink-800 bg-ink-50;
+    font-family: 'IBM Plex Sans', 'Noto Sans SC', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    margin: 0;
+    background-image: radial-gradient(circle at 1px 1px, rgba(15, 23, 42, 0.015) 1px, transparent 0);
+    background-size: 24px 24px;
+  }
+  h1, h2, h3 {
+    font-family: 'Noto Serif SC', Georgia, serif;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-paper border border-ink-200 rounded-xl;
+  }
+  .btn-primary {
+    @apply px-6 py-3 bg-amber-500 text-ink-900 font-semibold rounded-lg
+           hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed
+           transition-colors duration-200;
+  }
+  .btn-secondary {
+    @apply px-6 py-3 border border-ink-200 text-ink-700 font-medium rounded-lg
+           hover:bg-ink-100 disabled:opacity-50 disabled:cursor-not-allowed
+           transition-colors duration-200;
+  }
+}
