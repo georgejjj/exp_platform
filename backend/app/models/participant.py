@@ -35,3 +35,4 @@ class Participant(Base):
     trading_sessions = relationship("TradingSession", back_populates="participant", cascade="all, delete-orphan")
     guidance_responses = relationship("GuidanceResponse", back_populates="participant", cascade="all, delete-orphan")
     event_logs = relationship("EventLog", back_populates="participant", cascade="all, delete-orphan")
+    race_car_sessions = relationship("RaceCarGameSession", cascade="all, delete-orphan")

@@ -28,3 +28,22 @@ def calculate_cognitive_score(responses: list[dict]) -> tuple[float, int, int]:
     correct = sum(1 for r in responses if r.get("is_correct"))
     total = len(responses)
     return round(correct / total * 100, 1), correct, total
+
+
+def calculate_game_fallacy_score(rounds: list[dict]) -> tuple[float | None, float | None]:
+    """Score gambler's fallacy from race-car-game predictions.
+
+    A round is a "streak opportunity" when the obstacles in the rounds immediately
+    before it formed a same-side streak of length >= 2. On such rounds, a prediction
+    on the OPPOSITE side of the streak is an anti-streak (gambler's-fallacy) bet.
+    Score = anti-streak bets / streak opportunities, scaled to 0-100.
+    """
+    streak_rounds = [
+        r for r in rounds
+        if r.get("streak_length", 0) >= 2 and r.get("is_streak_reversal_prediction") is not None
+    ]
+    if not streak_rounds:
+        return None, None
+    reversal_bets = sum(1 for r in streak_rounds if r["is_streak_reversal_prediction"])
+    ratio = reversal_bets / len(streak_rounds)
+    return round(ratio * 100, 1), round(ratio, 4)

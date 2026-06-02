@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState } from 'react';
-import type { CompleteResponse, SettlementData } from '../types';
+import type { CompleteResponse, SettlementData, RaceCarCompleteResponse } from '../types';
 
 interface ExperimentState {
   preTestResult: CompleteResponse | null;
   postTestResult: CompleteResponse | null;
   round1Settlement: SettlementData | null;
   round2Settlement: SettlementData | null;
+  gameResult: RaceCarCompleteResponse | null;
 }
 
 interface ExperimentContextType extends ExperimentState {
@@ -13,6 +14,7 @@ interface ExperimentContextType extends ExperimentState {
   setPostTestResult: (r: CompleteResponse) => void;
   setRound1Settlement: (s: SettlementData) => void;
   setRound2Settlement: (s: SettlementData) => void;
+  setGameResult: (r: RaceCarCompleteResponse) => void;
 }
 
 const ExperimentContext = createContext<ExperimentContextType | null>(null);
@@ -22,6 +24,7 @@ export function ExperimentProvider({ children }: { children: React.ReactNode }) 
   const [postTestResult, setPostTestResult] = useState<CompleteResponse | null>(null);
   const [round1Settlement, setRound1Settlement] = useState<SettlementData | null>(null);
   const [round2Settlement, setRound2Settlement] = useState<SettlementData | null>(null);
+  const [gameResult, setGameResult] = useState<RaceCarCompleteResponse | null>(null);
 
   return (
     <ExperimentContext.Provider
@@ -30,10 +33,12 @@ export function ExperimentProvider({ children }: { children: React.ReactNode }) 
         postTestResult,
         round1Settlement,
         round2Settlement,
+        gameResult,
         setPreTestResult,
         setPostTestResult,
         setRound1Settlement,
         setRound2Settlement,
+        setGameResult,
       }}
     >
       {children}

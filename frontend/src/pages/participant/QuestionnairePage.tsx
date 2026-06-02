@@ -82,8 +82,8 @@ export default function QuestionnairePage() {
       const { data } = await completeQuestionnaire(phase!, questionnaireId);
       if (phase === 'pre_test') {
         setPreTestResult(data);
-        setStep('personality_feedback');
-        navigate('/personality-feedback');
+        setStep('race_car_game');
+        navigate('/race-car-game');
       } else {
         setPostTestResult(data);
         setStep('analysis');

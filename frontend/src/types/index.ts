@@ -245,6 +245,7 @@ export type ExperimentStep =
   | 'joined'
   | 'demographics'
   | 'pre_test'
+  | 'race_car_game'
   | 'personality_feedback'
   | 'phase1_trading'
   | 'phase1_settlement'
@@ -255,3 +256,52 @@ export type ExperimentStep =
   | 'phase2_settlement'
   | 'final_results'
   | 'completed';
+
+// Race car game
+export interface RaceCarGameRoundResult {
+  round_number: number;
+  prediction: 'L' | 'R';
+  obstacle_side: 'L' | 'R';
+  predicted_correctly: boolean;
+  jumped: boolean;
+  coins_earned: number;
+  streak_length: number;
+  streak_direction: 'L' | 'R' | null;
+}
+
+export interface RaceCarGameState {
+  session_id: string;
+  current_index: number;
+  total_intersections: number;
+  coins: number;
+  history: Array<'L' | 'R'>;
+  status: string;
+  recent_results?: RaceCarGameRoundResult[];
+}
+
+export interface RaceCarPredictResponse {
+  round_number: number;
+  prediction: 'L' | 'R';
+  obstacle_side: 'L' | 'R';
+  predicted_correctly: boolean;
+  jumped: boolean;
+  coins_earned: number;
+  total_coins: number;
+  history: Array<'L' | 'R'>;
+  is_last: boolean;
+  next_index: number;
+}
+
+export interface RaceCarCompleteResponse {
+  total_coins: number;
+  correct_count: number;
+  total_rounds: number;
+  fallacy_score: number | null;
+  streak_reversal_ratio: number | null;
+  cognitive_fallacy_score: number | null;
+  combined_score: number | null;
+  cognitive_weight: number;
+  behavioral_weight: number;
+  bias_level: string | null;
+  next_step: string;
+}

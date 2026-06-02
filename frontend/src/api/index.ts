@@ -16,6 +16,9 @@ import type {
   ExperimentOut,
   ExperimentStats,
   ParticipantSummary,
+  RaceCarGameState,
+  RaceCarPredictResponse,
+  RaceCarCompleteResponse,
 } from '../types';
 
 // Auth
@@ -73,6 +76,19 @@ export const submitGuidanceResponse = (
 
 export const completeTrading = () =>
   api.post<SettlementData>('/trading/complete');
+
+// Race car mini-game
+export const startRaceCarGame = () =>
+  api.post<RaceCarGameState>('/racecar/start');
+
+export const getRaceCarState = () =>
+  api.get<RaceCarGameState>('/racecar/state');
+
+export const submitRaceCarPrediction = (prediction: 'L' | 'R', response_time_ms?: number) =>
+  api.post<RaceCarPredictResponse>('/racecar/predict', { prediction, response_time_ms });
+
+export const completeRaceCarGame = () =>
+  api.post<RaceCarCompleteResponse>('/racecar/complete');
 
 // Analysis
 export const getComprehensiveAnalysis = () =>

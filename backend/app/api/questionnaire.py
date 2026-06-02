@@ -122,8 +122,8 @@ async def complete_questionnaire(
     if phase == "pre_test":
         bias_level = determine_bias_level(100 - score)
         participant.bias_level = bias_level
-        participant.current_step = "personality_feedback"
-        next_step = "personality_feedback"
+        participant.current_step = "race_car_game"
+        next_step = "race_car_game"
     else:
         participant.current_step = "analysis"
         next_step = "analysis"

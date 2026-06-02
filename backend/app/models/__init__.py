@@ -6,6 +6,7 @@ from app.models.guidance import GuidanceResponse
 from app.models.education import EducationContent
 from app.models.event_log import EventLog
 from app.models.researcher import Researcher
+from app.models.race_car_game import RaceCarGameSession, RaceCarRound
 
 __all__ = [
     "Experiment",
@@ -20,4 +21,6 @@ __all__ = [
     "EducationContent",
     "EventLog",
     "Researcher",
+    "RaceCarGameSession",
+    "RaceCarRound",
 ]

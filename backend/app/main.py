@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.api import auth, demographics, questionnaire, trading, analysis, education, events, admin
+from app.api import auth, demographics, questionnaire, trading, analysis, education, events, admin, race_car
 
 
 @asynccontextmanager
@@ -34,6 +34,7 @@ app.include_router(analysis.router)
 app.include_router(education.router)
 app.include_router(events.router)
 app.include_router(admin.router)
+app.include_router(race_car.router)
 
 
 @app.get("/api/health")
