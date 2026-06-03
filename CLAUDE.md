@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Web-based 2x2 experimental platform for studying the Gambler's Fallacy in investment decisions. Participants: demographic survey → behavioral test → simulated trading (Round 1) → personalized education → simulated trading (Round 2, with/without guidance) → results comparison.
+Web-based 2x2 experimental platform for studying the Gambler's Fallacy in investment decisions. Participants: demographic survey → behavioral test → race-car mini-game (second fallacy measurement) → personalized feedback → simulated trading (Round 1) → personalized education → simulated trading (Round 2, with/without guidance) → results comparison.
 
 ## Architecture
 
@@ -45,18 +45,18 @@ backend/app/
 ├── config.py        # Settings from .env (DATABASE_URL, SECRET_KEY)
 ├── database.py      # Engine, session, JSONType/UUIDType (SQLite-compatible)
 ├── seed.py          # Database seeding script
-├── models/          # SQLAlchemy ORM (12 models)
-├── schemas/         # Pydantic request/response (8 modules)
-├── api/             # Route handlers (8 routers + deps.py)
+├── models/          # SQLAlchemy ORM (14 models, incl. RaceCarGameSession/RaceCarRound)
+├── schemas/         # Pydantic request/response (9 modules)
+├── api/             # Route handlers (9 routers + deps.py)
 ├── services/        # Business logic (6 modules)
 └── utils/security.py
 
 frontend/src/
 ├── App.tsx          # React Router (all routes)
 ├── api/             # Axios client + all API functions
-├── context/         # AuthContext, ExperimentContext
+├── context/         # AuthContext, ExperimentContext (incl. gameResult)
 ├── hooks/           # useEventLogger (batched event logging)
-├── pages/           # participant/ (9 pages) + admin/ (2 pages)
+├── pages/           # participant/ (10 pages, incl. RaceCarGamePage) + admin/ (2 pages)
 ├── components/      # trading/, charts/, shared/
 ├── types/           # TypeScript interfaces
 └── utils/           # Formatters, label maps
@@ -109,21 +109,34 @@ Inspired by academic journals, financial terminals, and Chinese calligraphy.
 
 ## Participant Flow (Steps)
 
-`joined` → `demographics` → `pre_test` → `personality_feedback` → `phase1_trading` → `post_test` → `analysis` → `education` → `phase2_trading` → `final_results` → `completed`
+`joined` → `demographics` → `pre_test` → `race_car_game` → `personality_feedback` → `phase1_trading` → `post_test` → `analysis` → `education` → `phase2_trading` → `final_results` → `completed`
+
+## Race-Car Mini-Game
+
+A second gambler's-fallacy measurement inserted between the cognitive questionnaire and the personality feedback. Spec is taken from slide 7 of `财智方舟v3.pptx`.
+
+- **Mechanics**: 10 forked-road intersections, obstacle on left/right is i.i.d. 50/50. Player presses ← or → (or button) to predict which side the obstacle will appear on; the car auto-takes the opposite branch. Rewards: +30 coins correct, +10 if wrong-but-jumps (30% chance), else 0.
+- **Sequence generation**: SHA-256 of `participant_id` seeds a `random.Random`; generates a 10-flip sequence and rejects until at least one streak of length ≥ 3 exists (ensures the metric has signal). See `_generate_obstacle_sequence` in `backend/app/api/race_car.py`.
+- **Scoring** (`calculate_game_fallacy_score` in `fallacy_scorer.py`): for each round where the preceding obstacle streak ≥ 2, mark the prediction as anti-streak iff it differs from the streak direction. Score = anti-streak / streak-opportunity rounds × 100.
+- **Combined bias-level**: on `POST /api/racecar/complete` the backend computes the participant's actual cognitive fallacy from their `QuestionnaireResponse` rows, then sets `participant.bias_level = determine_bias_level(0.4 × cognitive + 0.6 × behavioral)`. The weights are `COGNITIVE_WEIGHT` / `BEHAVIORAL_WEIGHT` constants in `race_car.py` and are echoed back to the client so the UI can show the same arithmetic.
 
 ## Important Files
 
 - `backend/app/services/trading_engine.py` — Trade validation, execution, streak calculation
-- `backend/app/services/fallacy_scorer.py` — Behavioral (trading pattern) and cognitive (questionnaire) scoring
+- `backend/app/services/fallacy_scorer.py` — Cognitive (questionnaire), behavioral (trading pattern), and game (race-car) scoring
 - `backend/app/services/price_generator.py` — Binary (±10%) and normal (log-normal) price generation
 - `backend/app/services/analysis_engine.py` — Investor profile classification, comprehensive analysis
 - `backend/app/api/trading.py` — Core trading loop (period progression, settlement)
+- `backend/app/api/race_car.py` — Race-car game endpoints (`start`, `state`, `predict`, `complete`)
+- `backend/app/models/race_car_game.py` — `RaceCarGameSession`, `RaceCarRound`
 - `frontend/src/pages/participant/TradingPage.tsx` — Trading simulation UI
+- `frontend/src/pages/participant/RaceCarGamePage.tsx` — Race-car game UI (SVG road, scrolling motion, keyboard input)
 - `frontend/src/components/trading/GuidancePopup.tsx` — Phase 2 probability prediction modal
 
 ## Known Issues (Resolved)
 
 - **Duplicate trading sessions**: React dev mode double-fires `useEffect`, which could call `POST /trading/start` twice and create duplicate active sessions. Fixed by querying with `status == "active"` + `.limit(1)` in `start_trading`, and `.order_by(created_at.desc()).limit(1)` in all session lookups (`trading.py`, `analysis.py`).
+- **Async lazy-loading on race-car relationships**: SQLAlchemy async sessions raise `MissingGreenlet` if a relationship (e.g. `session.rounds`) is accessed inside an `async def` endpoint. In `race_car.py`, never traverse the `RaceCarGameSession.rounds` collection from the session object — issue a separate `select(RaceCarRound).where(game_session_id=...)` instead.
 
 ## Remaining Work
 
